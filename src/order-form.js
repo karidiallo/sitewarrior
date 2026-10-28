@@ -32,9 +32,9 @@ export function initOrderForm({ labels, language, getSelection, money }) {
       <input type="hidden" name="currency" />
       <input type="hidden" name="page_url" />
       <div class="sw-honey" aria-hidden="true"><label>Leave this field empty<input name="_gotcha" autocomplete="off" tabindex="-1" /></label></div>
-      <label class="sw-order-consent"><input type="checkbox" name="contact_consent" value="yes" required /> <span>${escapeHtml(labels.agree)}</span></label>
+      <label class="sw-order-consent"><input type="checkbox" name="privacy_acknowledgement" value="acknowledged" required /> <span>${escapeHtml(labels.agree)} <a class="sw-legal-link" href="${language === 'en' ? '/' : `/${language}/`}privacy/" target="_blank" rel="noopener noreferrer">${escapeHtml(labels.privacy)}</a> · <a class="sw-legal-link" href="${language === 'en' ? '/' : `/${language}/`}terms/" target="_blank" rel="noopener noreferrer">${escapeHtml(labels.terms)}</a></span></label>
       <p class="sw-order-status" id="sw-order-status" role="status" aria-live="polite"></p>
-      <div class="sw-order-actions"><button type="button" class="sw-order-cancel" data-close>${escapeHtml(labels.cancel)}</button><button type="submit" class="sw-order-submit">${escapeHtml(labels.submit)} <span aria-hidden="true">↗</span></button></div>
+      <div class="sw-order-actions"><button type="button" class="sw-order-cancel" data-close>${escapeHtml(labels.cancel)}</button><button type="submit" class="sw-order-submit">${escapeHtml(labels.submit)} <span aria-hidden="true">→</span></button></div>
     </form>
     <div class="sw-order-success" id="sw-order-success" hidden><p>${escapeHtml(labels.success)}</p><button type="button" data-close>${escapeHtml(labels.close)}</button></div>`;
   document.body.appendChild(dialog);

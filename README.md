@@ -47,3 +47,14 @@ The local dev server address is only a preview. **`git push origin main`** publi
 ## Pricing
 
 Polish PLN prices differ from rounded EUR prices for EN/NO/FR/DE. Express 48-hour delivery surcharge is provisionally 50%; confirm commercial terms before publishing.
+
+## Shared section anchors (EN / PL / NO / FR / DE)
+
+All languages use `#benefits` (why it works / simulation), `#process` (method), `#pricing` (configurator), and `#faq`. Visible copy remains translated. The language switch preserves these anchors and old links (`#arena`, `#metoda`, `#wycena`) are normalized in the browser.
+
+## Design / legal revision (October 2026)
+- Removed decorative emoji glyphs from site interactions (language flags remain intentional).
+- Replaced hard split in the decision section with a restrained dark-rust gradient.
+- Corrected public contact email to `contact@sitewarrior.eu`.
+- Added `/privacy/` and `/terms/` for EN, and equivalent paths under `/pl/`, `/no/`, `/fr/`, `/de/`; footer and Formspree enquiry dialog link to these.
+- IMPORTANT: these legal documents contain placeholders for the legal operator identity, address, data retention and provider transfer details. Finish and review them before publishing. See `LEGAL-REVIEW-REQUIRED.md`.

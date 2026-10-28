@@ -1,0 +1,3 @@
+# Required before publishing legal pages
+
+These documents are editorial drafts, not legal advice. Replace all bracketed placeholders in privacy/ and terms/ pages across EN/PL/NO/FR/DE with the actual legal entity name, registered address, retention schedule and verified subprocessors / international transfers. Verify the legal basis and whether an EU consumer withdrawal policy is required; terms should reflect the actual contracting entity and service contract. Confirm Formspree DPA and routing. The form collects an acknowledgement of having read notices; this is not a separate marketing opt-in. No marketing consent is collected.
