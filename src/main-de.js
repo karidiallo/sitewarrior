@@ -59,7 +59,30 @@ function quoteData(){const selected=packages.find(x=>x.id===packageId);const sel
 function renderQuote(){const {selected,selectedExtras,total,rush}=quoteData();$('#packages').innerHTML=packages.map(p=>`<button type="button" class="package-row ${p.id===packageId?'selected':''}" data-package="${p.id}" aria-pressed="${p.id===packageId}"><span class="radio-circle"></span><span class="package-main"><strong>${p.name}</strong><small>${p.desc}</small></span><span class="package-price">${money(p.price)}</span>${p.tag?`<span class="package-tag mono">${p.tag}</span>`:''}</button>`).join('');$('#addons').innerHTML=addons.map(a=>`<label class="addon-row"><input type="checkbox" data-addon="${a.id}" ${selectedAddons.has(a.id)?'checked':''}/><span class="custom-check">✓</span><span>${a.name}</span><strong>+ ${money(a.price)}</strong></label>`).join('');$('#deadlines').innerHTML=`<button class="delivery-choice ${!rush?'selected':''}" data-speed="standard" aria-pressed="${!rush}"><span>7 TAGE</span><small>INKLUSIVE</small></button><button class="delivery-choice ${rush?'selected':''}" data-speed="fast" aria-pressed="${rush}"><span>48 STUNDEN</span><small>EXPRESS +50 %*</small></button>`;$('#total').innerHTML=`${new Intl.NumberFormat('de-DE').format(total)} <span>€</span>`;$('#total').classList.remove('price-pulse');void $('#total').offsetWidth;$('#total').classList.add('price-pulse');const lines=[selected.name,...selectedExtras.map(a=>a.name),`Lieferung: ${rush?'48 Stunden':'7 Tage'}`];$('#summary').innerHTML=lines.map(x=>`<div><span>${x}</span><span>↗</span></div>`).join('');const quote=`SiteWarrior — Website-Anfrage\n\n${lines.map(x=>'• '+x).join('\n')}\n\nGeschätzter Nettopreis: ${money(total)}\n\nBitte kontaktiert mich.`;$('#order').href='#pricing';$('#copy-quote').onclick=async()=>{try{await navigator.clipboard.writeText(quote);toast('Angaben kopiert')}catch{toast('Kopieren fehlgeschlagen – bitte Anfragebutton nutzen')}};document.querySelectorAll('[data-package]').forEach(b=>b.addEventListener('click',()=>{packageId=b.dataset.package;renderQuote()}));document.querySelectorAll('[data-addon]').forEach(c=>c.addEventListener('change',()=>{c.checked?selectedAddons.add(c.dataset.addon):selectedAddons.delete(c.dataset.addon);renderQuote()}));document.querySelectorAll('[data-speed]').forEach(b=>b.addEventListener('click',()=>{speed=b.dataset.speed;renderQuote()}));}
 renderQuote();initOrderForm({labels:{"head": "Anfrage senden", "desc": "Dein gewähltes Paket und der geschätzte Preis werden automatisch übermittelt.", "name": "Name", "email": "E-Mail-Adresse", "phone": "Telefon (optional)", "business": "Unternehmen / Marke (optional)", "message": "Erzähl uns kurz von deinem Projekt (optional)", "agree": "Ich bin damit einverstanden, zu meiner Anfrage kontaktiert zu werden.", "submit": "Anfrage senden", "sending": "Wird gesendet…", "success": "Vielen Dank! Deine Anfrage wurde gesendet. Wir melden uns per E-Mail.", "failure": "Die Anfrage konnte nicht gesendet werden. Bitte versuche es erneut oder schreibe an kontakt@sitewarrior.eu.", "close": "Schließen", "estimate": "Zusammenfassung", "cancel": "Abbrechen", "required": "Bitte fülle die Pflichtfelder aus.", "subject": "Website-Anfrage — SiteWarrior"},language:'de',getSelection:quoteData,money});$('#year').textContent=new Date().getFullYear();
 function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('visible');clearTimeout(toast.timeout);toast.timeout=setTimeout(()=>el.classList.remove('visible'),2900)}
-$('#menu-toggle').addEventListener('click',()=>{const on=$('#navigation').classList.toggle('open');$('#menu-toggle').setAttribute('aria-expanded',on)});document.querySelectorAll('.nav-links a').forEach(a=>a.addEventListener('click',()=>{$('#navigation').classList.remove('open');$('#menu-toggle').setAttribute('aria-expanded','false')}));
+// Responsive menu: closed by default; dismisses on link, outside click, Escape, and desktop resize.
+const menuButton = $('#menu-toggle');
+const mobileMenu = $('#navigation');
+menuButton.setAttribute('aria-controls','navigation');
+function setMobileMenu(open) {
+  const expanded = Boolean(open) && window.innerWidth <= 800;
+  mobileMenu.classList.toggle('open', expanded);
+  menuButton.setAttribute('aria-expanded', String(expanded));
+  menuButton.setAttribute('aria-label', expanded ? 'Close menu' : 'Open menu');
+}
+setMobileMenu(false);
+menuButton.addEventListener('click', () => setMobileMenu(!mobileMenu.classList.contains('open')));
+mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMobileMenu(false)));
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && mobileMenu.classList.contains('open')) {
+    setMobileMenu(false); menuButton.focus();
+  }
+});
+document.addEventListener('pointerdown', event => {
+  if (!event.target.closest('.site-header') && mobileMenu.classList.contains('open')) setMobileMenu(false);
+});
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 800 && mobileMenu.classList.contains('open')) setMobileMenu(false);
+});
 const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in-view');observer.unobserve(e.target)}}),{threshold:.08});document.querySelectorAll('.section-heading,.process-card,.deliver-item,.faq-list,.manifesto,.hero-content > *').forEach(el=>{el.classList.add('reveal');observer.observe(el)});
 if(matchMedia('(pointer:fine) and (prefers-reduced-motion:no-preference)').matches){const obj=$('#hero-object');obj.addEventListener('pointermove',e=>{const r=obj.getBoundingClientRect();obj.style.setProperty('--mx',((e.clientX-r.left)/r.width-.5)*13+'px');obj.style.setProperty('--my',((e.clientY-r.top)/r.height-.5)*13+'px')});obj.addEventListener('pointerleave',()=>{obj.style.setProperty('--mx','0px');obj.style.setProperty('--my','0px')});document.querySelectorAll('.interactive-card').forEach(card=>card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect();card.style.setProperty('--x',`${e.clientX-r.left}px`);card.style.setProperty('--y',`${e.clientY-r.top}px`)}));}
 
