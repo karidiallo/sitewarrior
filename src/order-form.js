@@ -48,7 +48,7 @@ export function initOrderForm({ labels, language, getSelection, money }) {
   const open = () => {
     const {selected, selectedExtras, total, rush} = getSelection();
     const delivery = rush ? '48 h (+50%)' : '7 days / 7 dni';
-    const summary = [selected.name, ...selectedExtras.map(extra => extra.name), delivery, money(total) + ' net'].join('\n');
+    const summary = [selected.name, ...selectedExtras.map(extra => extra.name), rush ? (labels.deliveryRush || delivery) : (labels.deliveryStandard || delivery), money(total) + ' ' + (labels.net || 'net')].join('\n');
     form.elements.namedItem('package').value = selected.name;
     form.elements.namedItem('extras').value = selectedExtras.length ? selectedExtras.map(x=>x.name).join(', ') : 'None';
     form.elements.namedItem('delivery').value = delivery;
