@@ -5,7 +5,7 @@ export function initMotion({packages,addons,faqs,process}, language='en') {
 const t = key => translations[language]?.[key] ?? key;
 const locale = {en:'en-IE',pl:'pl-PL',de:'de-DE',fr:'fr-FR',no:'nb-NO'}[language];
 
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],clamp=x=>Math.max(0,Math.min(1,x));const frames=new Map(),c=$('#canvas'),ctx=c.getContext('2d'),stage=$('.stage'),film=$('.film');let p=0,target=0,paused=matchMedia('(prefers-reduced-motion: reduce)').matches,drawn=-1;function load(n){if(n<0||n>216||frames.has(n))return;let im=new Image();frames.set(n,im);im.src='/motion/frames/'+String(n+1).padStart(3,'0')+'.webp'}for(let n=0;n<217;n+=6)load(n);function draw(){let n=Math.round(p*216);for(let i=-8;i<=8;i++)load(n+i);let best=-1,d=999;for(let [k,v] of frames)if(v.complete&&v.naturalWidth&&Math.abs(k-n)<d){best=k;d=Math.abs(k-n)}if(best>=0&&best!==drawn){ctx.drawImage(frames.get(best),0,0,1280,720);drawn=best}stage.style.setProperty('--p',p);let a=p<.34?0:p<.69?1:2;$$('.scene').forEach((s,i)=>{s.classList.toggle('active',i===a);s.inert=i!==a});$('#bar').style.width=p*100+'%';$('#chapter').textContent='0'+(a+1)+' / 03'}function tick(){if(!paused){target=clamp(-film.getBoundingClientRect().top/Math.max(1,film.offsetHeight-stage.offsetHeight));p+=(target-p)*.14;if(Math.abs(target-p)<.0008)p=target}draw();requestAnimationFrame(tick)}tick();$('#pause').onclick=()=>{paused=!paused;$('#pause').textContent=paused?t('Resume motion'):t('Pause motion')};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],clamp=x=>Math.max(0,Math.min(1,x));const frames=new Map(),c=$('#canvas'),ctx=c.getContext('2d'),stage=$('.stage'),film=$('.film');let p=0,target=0,paused=matchMedia('(prefers-reduced-motion: reduce)').matches,drawn=-1;function load(n){if(n<0||n>216||frames.has(n))return;let im=new Image();frames.set(n,im);im.src='/motion/frames/'+String(n+1).padStart(3,'0')+'.webp'}for(let n=0;n<217;n+=6)load(n);function draw(){let n=Math.round(p*216);for(let i=-8;i<=8;i++)load(n+i);let best=-1,d=999;for(let [k,v] of frames)if(v.complete&&v.naturalWidth&&Math.abs(k-n)<d){best=k;d=Math.abs(k-n)}if(best>=0&&best!==drawn){ctx.drawImage(frames.get(best),0,0,1280,720);drawn=best}stage.style.setProperty('--p',p);const scenes=$$('.scene');const count=scenes.length||1;let a=count===1?0:(p<.34?0:p<.69?1:2);scenes.forEach((s,i)=>{s.classList.toggle('active',i===a);s.inert=i!==a});$('#bar').style.width=p*100+'%';$('#chapter').textContent=String(a+1).padStart(2,'0')+' / '+String(count).padStart(2,'0')}function tick(){if(!paused){target=clamp(-film.getBoundingClientRect().top/Math.max(1,film.offsetHeight-stage.offsetHeight));p+=(target-p)*.14;if(Math.abs(target-p)<.0008)p=target}draw();requestAnimationFrame(tick)}tick();$('#pause').onclick=()=>{paused=!paused;$('#pause').textContent=paused?t('Resume motion'):t('Pause motion')};
 const englishSteps=[['Direction.','We define your audience, offer and the action your website should encourage.'],['Structure.','We map the message, content and journey before designing the interface.'],['Production.','We design and develop responsive pages, with motion where it adds value.'],['Launch.','We test, publish and hand over access, including two hours of consultation.']];
 const steps=language==='en'?englishSteps:process.map((x,i)=>[x[1]+'.',i===3?t(englishSteps[3][1]):x[2]]);
 const work=$('.work'), workstage=$('.workstage'), object=$('#object');let step=-1;
@@ -34,5 +34,43 @@ $$('.audience-art').forEach(el=>{el.addEventListener('pointermove',e=>{if(paused
 const aliases={arena:'benefits',metoda:'process',wycena:'pricing',start:'contact',hero:'top'};
 function normalizeHash(){const key=location.hash.slice(1);if(aliases[key]){history.replaceState(null,'',location.pathname+location.search+'#'+aliases[key]);document.getElementById(aliases[key])?.scrollIntoView();}}normalizeHash();addEventListener('hashchange',normalizeHash);
 function updateLanguageLinks(){const key=({who:'who',services:'services',builder:'builder',pricing:'builder',benefits:'benefits',process:'process',faq:'faq',contact:'contact'})[location.hash.slice(1)];$$('.lang-menu a,.footer-languages a').forEach(a=>{const url=a.getAttribute('href').split('#')[0];a.setAttribute('href',url+(key?'#'+key:''))});}updateLanguageLinks();addEventListener('hashchange',updateLanguageLinks);
+
+
+const quickForm=document.getElementById('quick-lead-form');
+if(quickForm){
+  const quickStatus=document.getElementById('quick-status');
+  const quickMessages={
+    en:{sending:'Sending...',success:'Thanks — we received your message.',failure:'Something went wrong. Please try again or email us directly.'},
+    pl:{sending:'Wysyłanie...',success:'Dziękujemy — otrzymaliśmy Twoją wiadomość.',failure:'Coś poszło nie tak. Spróbuj ponownie lub napisz do nas bezpośrednio.'},
+    de:{sending:'Wird gesendet...',success:'Danke — wir haben Ihre Nachricht erhalten.',failure:'Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut oder schreiben Sie uns direkt.'},
+    fr:{sending:'Envoi...',success:'Merci — nous avons bien reçu votre message.',failure:'Une erreur est survenue. Réessayez ou écrivez-nous directement.'},
+    no:{sending:'Sender...',success:'Takk — vi har mottatt meldingen din.',failure:'Noe gikk galt. Prøv igjen eller send oss en e-post direkte.'}
+  };
+  const qm=quickMessages[language]||quickMessages.en;
+  quickForm.addEventListener('submit', async event=>{
+    event.preventDefault();
+    if(!quickForm.reportValidity()) return;
+    quickStatus.textContent=qm.sending;
+    const {selected, selectedExtras, total, rush} = {selected:packages.find(x=>x.id===chosen), selectedExtras:addons.filter(x=>document.querySelector('#extras input[value='+x.id+']')?.checked), total:cost, rush:document.querySelector('#extras input[value=rush]')?.checked};
+    const fd=new FormData(quickForm);
+    fd.append('_subject','SiteWarrior quick lead');
+    fd.append('language',language);
+    fd.append('package', selected?.name || '');
+    fd.append('extras', selectedExtras.length ? selectedExtras.map(x=>x.name).join(', ') : 'None');
+    fd.append('delivery', rush ? '48 h (+50%)' : '7 days / 7 dni');
+    fd.append('estimated_total_net', String(total||''));
+    fd.append('currency', language==='pl' ? 'PLN' : 'EUR');
+    fd.append('page_url', location.href);
+    try{
+      const res=await fetch('https://formspree.io/f/mjyyrqal',{method:'POST',body:fd,headers:{Accept:'application/json'}});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      quickForm.reset();
+      quickStatus.textContent=qm.success;
+    }catch(err){
+      console.error(err);
+      quickStatus.textContent=qm.failure;
+    }
+  });
+}
 
 }
